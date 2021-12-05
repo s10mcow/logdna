@@ -9,6 +9,7 @@ import FormLabel from "@mui/material/FormLabel";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
+import * as API from "./api";
 
 const PageWrapper = styled.div`
   display: flex;
@@ -164,6 +165,7 @@ function App() {
   const testAlert = () => {
     console.log("Alert Message", alertMessage);
     console.log("Recipients", recipients);
+    API.testAlert({ alertMessage, recipients });
   };
 
   return (
