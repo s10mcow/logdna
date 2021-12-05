@@ -5,9 +5,8 @@ export const testAlert = async (payload) => {
       method: "POST",
       body: JSON.stringify(payload),
     });
-
     const body = await response.json();
-    console.log("response", body);
+    return body;
   } catch (e) {
     console.log("FAILED API");
     return console.log(e);
@@ -20,7 +19,8 @@ export const saveRecipient = async (payload) => {
       body: JSON.stringify(payload),
     });
 
-    return response.json();
+    const body = await response.json();
+    return body;
   } catch (e) {
     return console.log(e);
   }

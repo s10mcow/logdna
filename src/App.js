@@ -147,12 +147,14 @@ function App() {
     setRecipients(newList);
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     if (checkEmail()) {
       const newList = recipients.concat([email]);
       console.log(newList);
       setRecipients(newList);
       setEmail("");
+      const res = await API.saveRecipient({ alertMessage, recipients });
+      console.log(res);
     }
     e.preventDefault();
   };
@@ -163,10 +165,9 @@ function App() {
     return isEmailValid;
   };
 
-  const testAlert = () => {
-    console.log("Alert Message", alertMessage);
-    console.log("Recipients", recipients);
-    API.testAlert({ alertMessage, recipients });
+  const testAlert = async () => {
+    const res = await API.testAlert({ alertMessage, recipients });
+    console.log(res);
   };
 
   return (
