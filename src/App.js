@@ -10,6 +10,7 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as API from "./api";
+import "./index.css";
 
 const PageWrapper = styled.div`
   display: flex;
