@@ -6,7 +6,8 @@ export const testAlert = async (payload) => {
       body: JSON.stringify(payload),
     });
 
-    console.log("response", response);
+    const body = await response.json();
+    console.log("response", body);
   } catch (e) {
     console.log("FAILED API");
     return console.log(e);
