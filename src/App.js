@@ -151,10 +151,12 @@ function App() {
     e.preventDefault();
     if (checkEmail()) {
       const newList = recipients.concat([email]);
-      console.log(newList);
       setRecipients(newList);
       setEmail("");
-      const res = await API.saveRecipient({ alertMessage, recipients });
+      const res = await API.saveRecipient({
+        alertMessage,
+        recipients: newList,
+      });
       console.log(res);
     }
   };
