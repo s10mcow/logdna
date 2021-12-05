@@ -148,6 +148,7 @@ function App() {
   };
 
   const save = async (e) => {
+    e.preventDefault();
     if (checkEmail()) {
       const newList = recipients.concat([email]);
       console.log(newList);
@@ -156,7 +157,6 @@ function App() {
       const res = await API.saveRecipient({ alertMessage, recipients });
       console.log(res);
     }
-    e.preventDefault();
   };
 
   const checkEmail = () => {
