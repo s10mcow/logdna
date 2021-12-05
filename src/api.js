@@ -9,7 +9,6 @@ export const testAlert = async (payload) => {
     return body;
   } catch (e) {
     console.log("FAILED API");
-    return console.log(e);
     return e;
   }
 };
