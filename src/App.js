@@ -62,6 +62,7 @@ const FormWrapper = styled.article`
       flex: 1;
       padding: 10px 0;
       overflow-x: auto;
+      min-height: 190px;
     }
 
     footer {
@@ -114,32 +115,12 @@ function App() {
   const [recipients, setRecipients] = React.useState([
     "sten_muchow@yahoo.com",
     "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
-    "sten.muchow@gmail.com",
   ]);
   const [alertMessage, setAlertMessage] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [isValidEmail, setEmailValid] = React.useState(true);
+  const [frequency, setFrequency] = React.useState("hourly");
+  const [helperText, setHelperText] = React.useState("");
+  const [hasError, setError] = React.useState(false);
 
   const remove = (email) => {
     console.log("removing", email);
@@ -149,26 +130,47 @@ function App() {
 
   const save = async (e) => {
     e.preventDefault();
-    if (checkEmail()) {
+    if (checkIsEmail() && !isDuplicate()) {
+      setError(false);
+      setHelperText("");
       const newList = recipients.concat([email]);
       setRecipients(newList);
       setEmail("");
       const res = await API.saveRecipient({
         alertMessage,
         recipients: newList,
+        frequency,
       });
       console.log(res);
     }
   };
 
-  const checkEmail = () => {
+  const isDuplicate = () => {
+    const isDuplicate = recipients.indexOf(email) !== -1;
+    if (isDuplicate) {
+      setError(true);
+      setHelperText("Email already exists.");
+    } else {
+      setError(false);
+      setHelperText("");
+    }
+    return isDuplicate;
+  };
+
+  const checkIsEmail = () => {
     const isEmailValid = /^\S+@\S+\.\S+$/.test(email);
-    setEmailValid(isEmailValid);
+    if (email && !isEmailValid) {
+      setError(true);
+      setHelperText("Invalid Email");
+    } else {
+      setError(false);
+      setHelperText("");
+    }
     return isEmailValid;
   };
 
   const testAlert = async () => {
-    const res = await API.testAlert({ alertMessage, recipients });
+    const res = await API.testAlert({ alertMessage, recipients, frequency });
     console.log(res);
   };
 
@@ -191,8 +193,10 @@ function App() {
               <FormLabel component="legend">Frequency</FormLabel>
               <RadioGroup
                 row
-                aria-label="gender"
+                aria-label="frequency"
                 name="row-radio-buttons-group"
+                value={frequency}
+                onChange={(e) => setFrequency(e.target.value)}
               >
                 <FormControlLabel
                   value="hourly"
@@ -211,9 +215,11 @@ function App() {
               label="Email Recipients"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              onBlur={checkEmail}
-              error={!isValidEmail}
-              helperText={!isValidEmail ? "Invalid email" : ""}
+              onBlur={() => {
+                checkIsEmail() && isDuplicate();
+              }}
+              error={hasError}
+              helperText={helperText}
             />
 
             <h4>Recipients</h4>
