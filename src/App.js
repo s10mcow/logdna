@@ -1,6 +1,5 @@
 import React from "react";
-import { IconButton, TextField } from "@mui/material";
-import styled from "styled-components";
+import { TextField, CircularProgress } from "@mui/material";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -8,108 +7,9 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Recipient, PageWrapper, FormWrapper } from "./components";
 import * as API from "./api";
 import "./index.css";
-
-const PageWrapper = styled.div`
-  display: flex;
-  width: 100vw;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-
-  * {
-    box-sizing: border-box;
-    &::after {
-      box-sizing: border-box;
-    }
-    &::before {
-      box-sizing: border-box;
-    }
-  }
-`;
-
-const FormWrapper = styled.article`
-  display: flex;
-  flex-direction: column;
-  width: 500px;
-  height: 600px;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 20px;
-
-  h4 {
-    margin: 0;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    padding: 0 50px;
-    height: 80%;
-    .innerWrapper {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
-    .MuiTextField-root {
-      margin: 15px 0;
-    }
-    .recipients {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      padding: 10px 0;
-      overflow-x: auto;
-      min-height: 190px;
-    }
-
-    footer {
-      margin-top: 10px;
-      min-height: 70px;
-    }
-  }
-
-  @media screen and (max-width: 500px) {
-    width: 100%;
-    height: 100%;
-    border: none;
-    padding-bottom: 120px;
-
-    form {
-      padding: 0;
-      height: 100%;
-    }
-
-    footer {
-      background: white;
-      padding: 10px;
-      border-radius: 6px;
-      border-top: 1px solid #ccc;
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: -5px;
-    }
-  }
-`;
-
-const RecipientWrapper = styled.article`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #ccc; ;
-`;
-
-const Recipient = ({ recipient, remove }) => (
-  <RecipientWrapper>
-    {recipient}
-    <IconButton aria-label="delete" onClick={remove}>
-      <DeleteIcon />
-    </IconButton>
-  </RecipientWrapper>
-);
 
 function App() {
   const [recipients, setRecipients] = React.useState([
@@ -121,16 +21,34 @@ function App() {
   const [frequency, setFrequency] = React.useState("hourly");
   const [helperText, setHelperText] = React.useState("");
   const [hasError, setError] = React.useState(false);
+  const [isAction, setAction] = React.useState(false);
 
   const remove = (email) => {
-    console.log("removing", email);
     const newList = recipients.filter((recipient) => recipient !== email);
     setRecipients(newList);
   };
 
-  const save = async (e) => {
+  const submit = (e) => {
+    //stop page reload
+    console.log(e);
+    if (e.nativeEvent.submitter.innerText === "TEST ALERT") {
+      testAlert();
+    }
+
+    if (e.nativeEvent.submitter.innerText === "SAVE") {
+      save();
+    }
     e.preventDefault();
+  };
+
+  const save = async () => {
+    if (!email) {
+      setError(true);
+      return setHelperText("Add an email.");
+    }
+
     if (checkIsEmail() && !isDuplicate()) {
+      setAction(true);
       setError(false);
       setHelperText("");
       const newList = recipients.concat([email]);
@@ -142,6 +60,9 @@ function App() {
         frequency,
       });
       console.log(res);
+      setTimeout(() => {
+        setAction(false);
+      }, 500);
     }
   };
 
@@ -170,8 +91,12 @@ function App() {
   };
 
   const testAlert = async () => {
+    setAction(true);
     const res = await API.testAlert({ alertMessage, recipients, frequency });
     console.log(res);
+    setTimeout(() => {
+      setAction(false);
+    }, 500);
   };
 
   return (
@@ -179,7 +104,7 @@ function App() {
       <FormWrapper>
         <h1>Email Alert</h1>
 
-        <form onSubmit={save}>
+        <form onSubmit={submit}>
           <div className="innerWrapper">
             <TextField
               required
@@ -211,6 +136,7 @@ function App() {
                 />
               </RadioGroup>
             </FormControl>
+
             <TextField
               label="Email Recipients"
               value={email}
@@ -234,13 +160,14 @@ function App() {
           </div>
 
           <footer>
-            <Stack spacing={2} direction="row">
-              <Button variant="contained" type="submit" onClick={testAlert}>
+            <Stack spacing={2} direction="row" alignItems="center">
+              <Button variant="contained" type="submit">
                 Test Alert
               </Button>
               <Button variant="outlined" type="submit">
                 Save
               </Button>
+              {isAction && <CircularProgress size={20} />}
             </Stack>
           </footer>
         </form>
