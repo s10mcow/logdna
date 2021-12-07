@@ -29,15 +29,16 @@ function App() {
   };
 
   const submit = (e) => {
-    //stop page reload
-    console.log(e);
-    if (e.nativeEvent.submitter.innerText === "TEST ALERT") {
+    const submitter = e?.nativeEvent?.submitter?.innerText;
+    if (submitter === "TEST ALERT") {
       testAlert();
     }
 
-    if (e.nativeEvent.submitter.innerText === "SAVE") {
+    if (submitter === "SAVE") {
       save();
     }
+
+    //stop page reload
     e.preventDefault();
   };
 
