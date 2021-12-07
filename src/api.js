@@ -1,5 +1,4 @@
 export const testAlert = async (payload) => {
-  console.log("TEST ALERT API", payload);
   try {
     const response = await fetch("/.netlify/functions/test-alert", {
       method: "POST",
@@ -12,6 +11,7 @@ export const testAlert = async (payload) => {
     return e;
   }
 };
+
 export const saveRecipient = async (payload) => {
   try {
     const response = await fetch("/.netlify/functions/save-recipient", {
